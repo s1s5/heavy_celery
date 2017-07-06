@@ -74,3 +74,18 @@ Tools used in rendering this package:
 
 .. _Cookiecutter: https://github.com/audreyr/cookiecutter
 .. _`cookiecutter-djangopackage`: https://github.com/pydanny/cookiecutter-djangopackage
+
+
+Development
+-----------
+
+    $ cookiecutter https://github.com/pydanny/cookiecutter-djangopackage
+
+    $ mkvirtualenv --no-site-packages heavy_celery
+    $ pip install tox
+
+    # test
+    $ make test-all
+
+    # release
+    $ make release

@@ -51,7 +51,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author='Shogo Sawai',
     author_email='shogo.sawai@gmail.com',
-    url='https://github.com/Shogo Sawai/heavy_celery',
+    url='https://github.com/s1s5/heavy_celery',
     packages=[
         'heavy_celery',
     ],
@@ -66,6 +66,7 @@ setup(
         'Framework :: Django :: 1.8',
         'Framework :: Django :: 1.9',
         'Framework :: Django :: 1.10',
+        'Framework :: Django :: 1.11',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
