@@ -5,11 +5,11 @@ heavy_celery
 .. image:: https://badge.fury.io/py/heavy_celery.svg
     :target: https://badge.fury.io/py/heavy_celery
 
-.. image:: https://travis-ci.org/Shogo Sawai/heavy_celery.svg?branch=master
-    :target: https://travis-ci.org/Shogo Sawai/heavy_celery
+.. image:: https://travis-ci.org/s1s5/heavy_celery.svg?branch=master
+    :target: https://travis-ci.org/s1s5/heavy_celery
 
-.. image:: https://codecov.io/gh/Shogo Sawai/heavy_celery/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/Shogo Sawai/heavy_celery
+.. image:: https://codecov.io/gh/s1s5/heavy_celery/branch/master/graph/badge.svg
+    :target: https://codecov.io/gh/s1s5/heavy_celery
 
 managed celery task
 
@@ -82,7 +82,7 @@ Development
     $ cookiecutter https://github.com/pydanny/cookiecutter-djangopackage
 
     $ mkvirtualenv --no-site-packages heavy_celery
-    $ pip install tox
+    $ pip install tox twine
 
     # test
     $ make test-all
