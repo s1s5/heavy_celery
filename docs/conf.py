@@ -252,3 +252,9 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
+
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
+import django
+django.setup()

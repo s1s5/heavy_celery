@@ -40,7 +40,7 @@ coverage: ## check code coverage quickly with the default Python
 	coverage run --source heavy_celery runtests.py tests
 	coverage report -m
 	coverage html
-	open htmlcov/index.html
+#	open htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/heavy_celery.rst
@@ -48,7 +48,7 @@ docs: ## generate Sphinx HTML documentation, including API docs
 	sphinx-apidoc -o docs/ heavy_celery
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
+#	$(BROWSER) docs/_build/html/index.html
 
 release: clean ## package and upload a release
 	python setup.py sdist upload

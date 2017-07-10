@@ -6,3 +6,26 @@ codecov>=2.0.0
 
 
 # Additional test requirements go here
+amqp
+billiard
+celery
+certifi
+chardet
+croniter
+future
+idna
+kombu
+pkginfo
+pluggy
+py
+python-dateutil
+pytz
+PyYAML
+requests
+requests-toolbelt
+six
+tqdm
+twine
+urllib3
+vine
+virtualenv
