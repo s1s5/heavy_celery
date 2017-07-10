@@ -3,3 +3,10 @@
 
 # Your app in editable mode.
 -e ../
+
+Django==1.11
+psycopg2==2.7.1
+django-redis-cache==1.7.1
+hiredis==0.2.0
+redis==2.10.5
+django-celery-beat==1.0.1

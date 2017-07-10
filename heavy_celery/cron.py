@@ -29,7 +29,7 @@ def spawner():
     }
     '''
     now = utils.get_now()
-    logger.debug('cron spawner {}'.format(now))
+    logger.info('cron spawner {}'.format(now))
     for schedule in models.CronSchedule.objects.filter(
             Q(next_time__lte=now),
             Q(total_run_count__lt=F('max_run_count')) | Q(max_run_count=-1),

@@ -25,3 +25,4 @@ urllib3
 vine
 virtualenv
 sphinx
+django-celery-beat

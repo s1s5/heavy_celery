@@ -1,0 +1,74 @@
+version: '2'
+
+volumes:
+  pg_data:
+  media_root:
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:9.6.2
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - PGDATA=/postgres/data
+    volumes:
+      - pg_data:/postgres/data
+
+  # Redis
+  redis:
+    image: redis:2.8.19
+      
+  # RabbitMQ
+  rabbit:
+    image: rabbitmq:3.6.0
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=mypass3
+
+  # Django web server
+  web_base:
+    build:
+      context: ..
+      dockerfile: example/Dockerfile
+    command: "true"
+    environment:
+      - DB_TYPE=postgres
+      - DB_ADDR=db
+      - DB_PORT=5432
+      - RABBIT_HOSTNAME=rabbit:5672
+      - RABBIT_USER=admin
+      - RABBIT_PASS=mypass3
+      - RABBIT_VHOST=
+      - DEUBG=True
+      - CACHE_TYPE=redis
+    volumes:
+      - media_root:/data/media
+
+  web_app:
+    extends:
+      web_base
+    hostname: web
+    command: bash -c "sleep 5; python manage.py migrate; python manage.py runserver 0.0.0.0:8000"
+    expose:
+      - "8000"
+    depends_on:
+      - rabbit
+      - redis
+      - db
+      
+  celery_worker:
+    extends:
+      web_base
+    command: bash -c "sleep 10; celery worker -Q default -A example.celery_conf -E -l info --concurrency=4"
+
+  celery_worker_ts:
+    extends:
+      web_base
+    command: bash -c "sleep 10; celery worker -Q time_sensitive -A example.celery_conf -E -l info --concurrency=4"
+
+  celery_beat:
+    extends:
+      web_base
+    command: bash -c "rm -f /tmp/celerybeat.pid; sleep 10; celery beat -A example.celery_conf -l info -S django -s /tmp/celerybeat-schedule.db --pidfile /tmp/celerybeat.pid"

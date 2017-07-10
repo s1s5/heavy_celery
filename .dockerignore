@@ -1,0 +1,10 @@
+backup
+media_root
+build
+dist
+docs
+htmlcov
+heavy_celery.egg-info
+.git
+.tox
+

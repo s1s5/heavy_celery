@@ -142,8 +142,7 @@ def worker_ready_handler(*args, **kwargs):
 
 @heartbeat_sent.connect
 def heartbeat_sent_handler(*args, **kwargs):
-    # logger.debug('Worker Signals heartbeat_sent {} {}'.format(args, kwargs))
-    pass
+    logger.info('Worker Signals heartbeat_sent {} {}'.format(args, kwargs))
 
 
 @worker_process_init.connect
