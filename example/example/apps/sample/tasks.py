@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import logging
+import time
+
 from celery.schedules import crontab
 from heavy_celery import base
 from example.celery_conf import app
@@ -21,6 +23,14 @@ def hello_world(*args, **kwargs):
 @app.task(base=base.Task)
 def test_exception(*args, **kwargs):
     raise Exception('hello world')
+
+
+@app.task(base=base.Task)
+def hello_world2(*args, **kwargs):
+    time.sleep(5)
+    logger.info("test task {} {}".format(args, kwargs))
+    time.sleep(5)
+    return 'hello world'
 
 
 @app.task()

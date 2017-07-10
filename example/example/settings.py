@@ -103,6 +103,11 @@ LOGGING = {
         },
     },
     'loggers': {
+        'heavy_celery': {
+            'handlers': ['console', ],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
         os.path.basename(PROJECT_NAME): {
             'handlers': ['console', ],
             'level': 'INFO',

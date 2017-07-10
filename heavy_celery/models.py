@@ -35,6 +35,39 @@ TASK_STATE = (
 
 
 @python_2_unicode_compatible
+class Worker(models.Model):
+    worker_id = models.CharField('ワーカーID', max_length=256)
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(blank=True, null=True)
+    beated_at = models.DateTimeField(blank=True, null=True)
+
+    class State:
+        RUNNING = 0
+        STOPPED = 1
+        BEAT_FAILED = 2
+
+    STATE_CHOICES = (
+        (State.RUNNING, "開始"),
+        (State.STOPPED, "停止"),
+        (State.BEAT_FAILED, "応答なし"),
+    )
+
+    status = models.IntegerField(choices=STATE_CHOICES, default=State.RUNNING)
+
+    def __str__(self):
+        return 'worker({})'.format(self.worker_id)
+
+
+@python_2_unicode_compatible
+class WorkerTaskLog(models.Model):
+    worker = models.ForeignKey(Worker)
+    task_id = models.CharField(max_length=256, unique=True)
+    task_path = models.CharField(max_length=256)
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(blank=True, null=True)
+
+
+@python_2_unicode_compatible
 class TaskSignature(models.Model):
     name = models.CharField('名前', max_length=256, blank=True, null=True)
     description = models.TextField('詳細', blank=True, null=True)

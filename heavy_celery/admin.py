@@ -8,6 +8,19 @@ from django.contrib import admin
 from . import models
 
 
+@admin.register(models.Worker)
+class WorkerAdmin(admin.ModelAdmin):
+    model = models.Worker
+    list_display = ('id', 'status', 'worker_id', 'started_at', 'ended_at', 'beated_at')
+    list_filter = ('status', )
+
+
+@admin.register(models.WorkerTaskLog)
+class WorkerTaskLogAdmin(admin.ModelAdmin):
+    model = models.WorkerTaskLog
+    list_display = ('id', 'worker', 'task_id', 'task_path', 'started_at', 'ended_at')
+
+
 @admin.register(models.CronSchedule)
 class CronScheduleAdmin(admin.ModelAdmin):
     model = models.CronSchedule
