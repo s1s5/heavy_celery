@@ -1,2 +1,26 @@
-
 # Additional requirements go here
+amqp
+billiard
+celery
+certifi
+chardet
+croniter
+Django
+future
+idna
+kombu
+pkginfo
+pluggy
+py
+python-dateutil
+pytz
+PyYAML
+requests
+requests-toolbelt
+six
+tox
+tqdm
+twine
+urllib3
+vine
+virtualenv
