@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 
-import datetime
+# import datetime
 import uuid
 import logging
 
@@ -81,7 +81,8 @@ def after_task_publish_handler(*args, **kwargs):
 @task_prerun.connect
 def task_prerun_handler(*args, **kwargs):
     logger.debug('Task Signals task_prerun {} {}'.format(args, kwargs))
-    worker, _ = models.Worker.objects.get_or_create(worker_id=_get_worker_id())
+    worker, _ = models.Worker.objects.update_or_create(
+        worker_id=_get_worker_id(), defaults=dict(beated_at=timezone.now()))
     models.WorkerTaskLog.objects.create(
         worker=worker, task_id=kwargs['task_id'], task_path=kwargs['task'].name)
 
