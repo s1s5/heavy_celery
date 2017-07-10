@@ -88,4 +88,5 @@ Development
     $ make test-all
 
     # release
+    $ python setup.py publish  # at first
     $ make release
