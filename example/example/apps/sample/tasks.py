@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import logging
 import time
+import io
 
 from celery.schedules import crontab
 from example.celery_conf import app
@@ -33,6 +34,19 @@ def hello_world2(*args, **kwargs):
     logger.info("test task {} {}".format(args, kwargs))
     time.sleep(5)
     return 'hello world'
+
+
+@app.task(base=base.FileTask("txt"))
+def create_file(*args, **kwargs):
+    sio = io.StringIO()
+    sio.write('args={} kwargs={}'.format(args, kwargs))
+    sio.seek(0)
+    return sio
+
+
+@app.task(base=base.FileTask("txt"))
+def create_file2(*args, **kwargs):
+    return 'args={} kwargs={}'.format(args, kwargs)
 
 
 @app.task()

@@ -156,8 +156,8 @@ class CeleryTask(models.Model):
     status = models.CharField(
         'ステータス', max_length=64, choices=TASK_STATE, default='sent')
     stack_trace = models.TextField('スタックトレース', blank=True, null=True)
-    result_string = models.TextField('結果', blank=True, null=True)
-    result_file = models.FileField(
+    result_text = models.TextField('結果', blank=True, null=True)
+    result_data = models.FileField(
         '結果ファイル', blank=True, null=True, storage=SimpleLazyObject(import_string(
             'heavy_celery.storage.CeleryTaskFileStorage')))
 

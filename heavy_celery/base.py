@@ -8,8 +8,10 @@ import logging
 import celery
 import json
 import yaml
+import six
 
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.utils import timezone
 
 from . import models, utils
@@ -88,7 +90,7 @@ class Task(celery.Task):
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         if self.task.status == 'succeeded':
-            self.task.result_string = json.dumps(retval)
+            self.task.result_text = json.dumps(retval)
             self.task.save()
         logger.debug("{} after_return status={}.".format(self.request.id, status))
 
@@ -97,14 +99,22 @@ class FileTask_(Task):
 
     def __call__(self, *args, **kwargs):
         retval = super(FileTask_, self).__call__(*args, **kwargs)
-        if self.task.status == 'succeeded':
+        try:
             filename = '{}.{}'.format(uuid.uuid4().hex, self.ext)
             if hasattr(retval, 'read'):
-                self.task.result_file.save(filename, File(retval), save=True)
-                self.task.save()
+                self.task.result_data.save(filename, File(retval), save=True)
+            elif isinstance(retval, six.text_type):
+                self.task.result_data.save(filename, ContentFile(
+                    retval.encode(getattr(self, 'encode', 'UTF-8'))), save=True)
+            elif isinstance(retval, six.string_types) or isinstance(retval, six.binary_type):
+                self.task.result_data.save(filename, ContentFile(retval), save=True)
             else:
                 return None
+            self.task.save()
             return filename
+        except:
+            logger.exception('FileTask_ failed')
+            raise
 
 
 def FileTask(extension, base_class=FileTask_):
