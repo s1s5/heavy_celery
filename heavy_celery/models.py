@@ -9,8 +9,8 @@ from celery.task.control import revoke as celery_revoke
 
 from django.conf import settings
 from django.db import models
-from django.utils.module_loading import import_string
 from django.utils.functional import SimpleLazyObject
+from django.utils.module_loading import import_string
 
 from . import utils
 
@@ -158,9 +158,8 @@ class CeleryTask(models.Model):
     stack_trace = models.TextField('スタックトレース', blank=True, null=True)
     result_string = models.TextField('結果', blank=True, null=True)
     result_file = models.FileField(
-        '結果ファイル', storage=SimpleLazyObject(import_string(
-            settings.CELERY_TASK_FILE_STORAGE if hasattr(settings, 'CELERY_TASK_FILE_STORAGE')
-            else settings.DEFAULT_FILE_STORAGE)), blank=True, null=True)
+        '結果ファイル', blank=True, null=True, storage=SimpleLazyObject(import_string(
+            'heavy_celery.storage.CeleryTaskFileStorage')))
 
     created_at = models.DateTimeField(auto_now_add=True)
     start_at = models.DateTimeField(editable=False, blank=True, null=True)
