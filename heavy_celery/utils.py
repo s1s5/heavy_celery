@@ -12,15 +12,18 @@ from croniter import croniter
 
 
 _app = None
+_task = {}
 _user = {}
 _middleware = None
 
 
-def set_user(user):
-    _user[threading.current_thread()] = user
+def set_task(task):
+    _task[threading.current_thread()] = task
+    _user[threading.current_thread()] = task.user
 
 
-def reset_user():
+def reset_task():
+    _task.pop(threading.current_thread(), None)
     _user.pop(threading.current_thread(), None)
 
 
@@ -55,3 +58,40 @@ def get_next_cron(cron_expr, now=None):
     if now is None:
         now = get_now()
     return croniter(cron_expr, now).get_next(datetime)
+
+
+class Logger(object):
+    class F(object):
+        def __init__(self, func, level_id):
+            self.func = func
+            self.level_id = level_id
+
+        def __call__(self, *args, **kwargs):
+            return self.func(self.level_id, *args, **kwargs)
+
+    def __init__(self, task, root_logger, propagate):
+        from .models import CeleryTaskLog
+        self.root_logger = root_logger
+        self.propagate = propagate
+        self.task = task
+        self.klass = CeleryTaskLog
+        self._map = dict(self.klass.LEVEL_CHOICES)
+
+        for level_id, level_string in self.klass.LEVEL_CHOICES:
+            setattr(self, level_string, self.F(self._log, level_id))
+            setattr(self, 'get_{}'.format(level_string), self.F(self._get_log, level_id))
+
+    def _log(self, level, text):
+        if self.propagate:
+            getattr(self.root_logger, self._map[level])(text)
+        self.klass.objects.create(task=self.task, level=level, text=text)
+
+    def _get_log(self, level):
+        return self.klass.objects.create(task=self.task, level=level, text="")
+
+
+def get_logger(default_logger, propagate=True):
+    t = _task.get(threading.current_thread(), None)
+    if t:
+        return Logger(t, default_logger, propagate)
+    return default_logger

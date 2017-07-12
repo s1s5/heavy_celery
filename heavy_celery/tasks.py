@@ -119,7 +119,7 @@ def task_revoked_handler(request=None, *args, **kwargs):
     except models.CeleryTask.DoesNotExist:
         pass
     logger.debug('Task Signals task_revoked {} {}'.format(args, kwargs))
-    utils.reset_user()
+    utils.reset_task()
 
 
 @task_unknown.connect

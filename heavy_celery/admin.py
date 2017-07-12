@@ -66,3 +66,10 @@ class CeleryTaskAdmin(admin.ModelAdmin):
     list_filter = ('status', )
 
     actions = [reexecute_tasks, cancel_revoke_tasks, ]
+
+
+@admin.register(models.CeleryTaskLog)
+class CeleryTaskLogAdmin(admin.ModelAdmin):
+    model = models.CeleryTaskLog
+    list_display = ('id', 'task', 'level', 'text', 'created_at', 'updated_at')
+    list_filter = ('level', )

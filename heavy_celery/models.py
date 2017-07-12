@@ -178,3 +178,28 @@ class CeleryTask(models.Model):
             self.status = 'revoking'
         celery_revoke(self.task_id, terminate=True)
         self.save()
+
+
+class CeleryTaskLog(models.Model):
+    class Level:
+        DEBUG = 0
+        INFO = 1
+        WARNING = 2
+        ERROR = 3
+        CRITICAL = 4
+        EXCEPTION = 5
+
+    LEVEL_CHOICES = (
+        (Level.DEBUG, "debug"),
+        (Level.INFO, "info"),
+        (Level.WARNING, "warning"),
+        (Level.ERROR, "error"),
+        (Level.CRITICAL, "critical"),
+        (Level.EXCEPTION, "exception"),
+    )
+
+    task = models.ForeignKey(CeleryTask)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    level = models.IntegerField(choices=LEVEL_CHOICES)
+    text = models.TextField()

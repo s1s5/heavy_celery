@@ -7,8 +7,8 @@ import logging
 import time
 
 from celery.schedules import crontab
-from heavy_celery import base
 from example.celery_conf import app
+from heavy_celery import base, utils
 from heavy_celery.cron import spawner as _cron_scheduler
 
 logger = logging.getLogger(__name__)
@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 @app.task(base=base.Task)
 def hello_world(*args, **kwargs):
     logger.info("test task {} {}".format(args, kwargs))
+    _log = utils.get_logger(logger)
+    _log.info("xx test log task {} {}".format(args, kwargs))
     return 'hello world'
 
 

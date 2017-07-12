@@ -44,7 +44,7 @@ class Task(celery.Task):
         self._task = None
         logger.debug("{} {} is started.".format(self.request.id, self.task))
         try:
-            utils.set_user(self.task.user)
+            utils.set_task(self.task)
             if self.task.status == 'cancel':
                 self.task.status = 'cancelled'
                 return
@@ -63,7 +63,7 @@ class Task(celery.Task):
         finally:
             self.task.end_at = timezone.now()
             self.task.save()
-            utils.reset_user()
+            utils.reset_task()
             logger.debug("{} is terminated.".format(self.request.id))
 
     def on_success(self, retval, task_id, args, kwargs):
