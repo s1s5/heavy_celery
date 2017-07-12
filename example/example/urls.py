@@ -21,12 +21,15 @@ from django.conf import settings
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'', include('heavy_celery.urls', namespace='heavy_celery')),
 ]
 
 # media
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+urlpatterns += [
+    url(r'', include('heavy_celery.urls', namespace='heavy_celery')),
+]
 
 # if settings.DEBUG:
 #     import debug_toolbar

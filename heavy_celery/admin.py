@@ -62,7 +62,8 @@ cancel_revoke_tasks.short_description = "Taskをcancel/revokeする"
 class CeleryTaskAdmin(admin.ModelAdmin):
     model = models.CeleryTask
     list_display = ('id', 'status', 'user', 'task_id', 'task_path',
-                    'created_at', 'updated_at', 'start_at', 'end_at')
+                    'created_at', 'updated_at', 'start_at', 'end_at',
+                    'result_text', 'result_data')
     list_filter = ('status', )
 
     actions = [reexecute_tasks, cancel_revoke_tasks, ]
