@@ -57,6 +57,9 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+
+    'django_busybody.middlewares.GlobalRequestMiddleware',
+
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -334,6 +337,7 @@ CELERY_QUEUES = (
 ############################################
 INSTALLED_APPS += [
     'django_celery_beat',
+    'django_busybody',
 
     'example.apps.sample',
 ]

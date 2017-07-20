@@ -5,7 +5,7 @@ from __future__ import print_function
 import threading
 from datetime import datetime
 
-# from django.conf import settings
+from django.conf import settings
 from django.utils import timezone
 # from django.utils.module_loading import import_string
 from croniter import croniter
@@ -14,7 +14,7 @@ from croniter import croniter
 _app = None
 _task = {}
 _user = {}
-_middleware = None
+_get_request = None
 
 
 def set_task(task):
@@ -27,24 +27,33 @@ def reset_task():
     _user.pop(threading.current_thread(), None)
 
 
+def _return_none():
+    return None
+
+
 def get_user():
-    global _middleware
+    global _get_request
 
     user = _user.get(threading.current_thread(), None)
     if user:
         return user
 
-    if _middleware is None:
-        try:
-            from crequest.middleware import CrequestMiddleware
-        except ImportError:
-            class CrequestMiddleware(object):
-                @classmethod
-                def get_request(klass):
-                    return None
-        _middleware = CrequestMiddleware
+    if _get_request is None:
+        if 'django_busybody.middlewares.GlobalRequestMiddleware' in settings.MIDDLEWARE_CLASSES:
+            try:
+                from django_busybody.tools import get_global_request
+                _get_request = get_global_request
+            except ImportError:
+                _get_request = _return_none
 
-    request = _middleware.get_request()
+        elif 'crequest.middleware.CrequestMiddleware' in settings.MIDDLEWARE_CLASSES:
+            try:
+                from crequest.middleware import CrequestMiddleware
+                _get_request = CrequestMiddleware.get_request
+            except ImportError:
+                _get_request = _return_none
+
+    request = _get_request()
     if request:
         return request.user
     return None
