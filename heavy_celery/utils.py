@@ -39,19 +39,20 @@ def get_user():
         return user
 
     if _get_request is None:
+        _get_request = _return_none
         if 'django_busybody.middlewares.GlobalRequestMiddleware' in settings.MIDDLEWARE_CLASSES:
             try:
                 from django_busybody.tools import get_global_request
                 _get_request = get_global_request
             except ImportError:
-                _get_request = _return_none
+                pass
 
         elif 'crequest.middleware.CrequestMiddleware' in settings.MIDDLEWARE_CLASSES:
             try:
                 from crequest.middleware import CrequestMiddleware
                 _get_request = CrequestMiddleware.get_request
             except ImportError:
-                _get_request = _return_none
+                pass
 
     request = _get_request()
     if request:
