@@ -34,12 +34,15 @@ class Task(celery.Task):
         user = kwargs_.get('user')
         if user is None:
             user = utils.get_user()
-        result = super(Task, self).apply_async(args=args, kwargs=kwargs, *args_, **kwargs_)
-        logger.debug('created celery task : {} {} name={}'.format(user, result.task_id, self.name))
+        task_id = kwargs_.pop('task_id', None)
+        if task_id is None:
+            task_id = uuid.uuid4().hex
         models.CeleryTask.objects.create(
-            user=user, task_id=result.task_id, task_path=self.name,
+            user=user, task_id=task_id, task_path=self.name,
             args=yaml.dump(args if args is not None else ()),
             kwargs=yaml.dump(kwargs if kwargs is not None else {}))
+        result = super(Task, self).apply_async(args=args, kwargs=kwargs, task_id=task_id, *args_, **kwargs_)
+        logger.debug('created celery task : {} {} name={}'.format(user, result.task_id, self.name))
         return result
 
     def __call__(self, *args, **kwargs):
