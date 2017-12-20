@@ -60,7 +60,7 @@ class Worker(models.Model):
 
 @python_2_unicode_compatible
 class WorkerTaskLog(models.Model):
-    worker = models.ForeignKey(Worker)
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
     task_id = models.CharField(max_length=256, unique=True)
     task_path = models.CharField(max_length=256)
     started_at = models.DateTimeField(auto_now_add=True)
@@ -113,7 +113,7 @@ class CronSchedule(models.Model):
 
     cron_expr = models.CharField('cron', max_length=256)
     next_time = models.DateTimeField(blank=True, null=True)
-    task = models.ForeignKey(TaskSignature)
+    task = models.ForeignKey(TaskSignature, on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -146,7 +146,7 @@ class CronSchedule(models.Model):
 
 
 class CeleryTask(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
     task_id = models.CharField('タスクID', max_length=256, unique=True)
 
     task_path = models.CharField('タスク名', max_length=256, blank=True, null=True)
@@ -197,7 +197,7 @@ class CeleryTaskLog(models.Model):
         (Level.EXCEPTION, "exception"),
     )
 
-    task = models.ForeignKey(CeleryTask)
+    task = models.ForeignKey(CeleryTask, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     level = models.IntegerField(choices=LEVEL_CHOICES)
