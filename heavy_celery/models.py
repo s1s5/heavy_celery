@@ -103,7 +103,7 @@ class TaskSignature(models.Model):
         return super(TaskSignature, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.name if self.name else self.task_path
+        return '[{}]{}'.format(self.pk, self.name if self.name else self.task_path)
 
 
 @python_2_unicode_compatible
@@ -140,8 +140,8 @@ class CronSchedule(models.Model):
         return super(CronSchedule, self).save(*args, **kwargs)
 
     def __str__(self):
-        return '{} {} {}'.format(
-            self.name if self.name else '',
+        return '[{}] {} {} {}'.format(
+            self.pk, self.name if self.name else '',
             self.cron_expr, self.task)
 
 

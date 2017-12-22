@@ -51,7 +51,75 @@ Add heavy_celery's URL patterns:
 Features
 --------
 
-* TODO
+settings.py
+-----------
+
+.. code-block:: python
+
+    CELERY_DEFAULT_QUEUE = 'default'
+    CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'
+    CELERY_DEFAULT_ROUTING_KEY = 'default'
+    
+    CELERY_QUEUES = (
+        Queue('default', Exchange('default'), routing_key='default'),
+        Queue('time_sensitive', Exchange('time_sensitive'), routing_key='time_sensitive_tasks'),
+        Queue('background', Exchange('background'), routing_key='background'),
+    )
+
+
+cronの機能を使うために
+----------------------
+
+.. code-block:: python
+    
+    from heavy_celery.cron import spawner as _cron_scheduler
+    
+    @app.task()
+    def cron_scheduler():
+        _cron_scheduler()
+    
+    app.conf.beat_schedule = {
+        'cron_scheduler': {
+            'task': '<appname>.tasks.cron_scheduler',
+            'schedule': crontab(),
+            'args': (),
+            'options': dict(queue='time_sensitive', routing_key='time_sensitive_tasks'),
+        },
+    }
+
+
+task定義の仕方
+--------------
+
+.. code-block:: python
+    from heavy_celery import base
+    
+    @app.task(base=base.Task)
+    def command(command_name, *args, **kw):
+        call_command(command_name, *args, **kw)
+
+
+タスクの定期実行のやり方
+------------------------
+
+- TaskSignatureの追加
+ - name : タスク名
+ - description : タスク詳細
+ - task_path : タスクパス e.g) apps.foo.tasks.example_task
+ - args : タスクに渡す引数
+ - kwargs : タスクに渡すkw引数
+ - options : タスクのスケジュールオプション、どのQueueにいれるかとか
+   したみたいにしておけば、time_sensitiveのQueueで走るようになる
+  - queue: time_sensitive
+    routing_key: time_sensitive_tasks
+
+- CronScheduleの追加
+ - name : cronタスク名
+ - description : cronタスク詳細
+ - cron_expr : cron表記
+ - task : TaskSignatureオブジェクト
+ - max_run_count : 最大繰り返し回数
+
 
 Running Tests
 -------------
