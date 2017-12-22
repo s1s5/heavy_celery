@@ -6,5 +6,5 @@ from django.conf.urls import url, include
 from heavy_celery.urls import urlpatterns as heavy_celery_urls
 
 urlpatterns = [
-    url(r'^', include(heavy_celery_urls, namespace='heavy_celery')),
+    url(r'^', include((heavy_celery_urls, 'heavy_celery'), namespace='heavy_celery')),
 ]
