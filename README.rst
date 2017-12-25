@@ -72,6 +72,8 @@ cronの機能を使うために
 
 .. code-block:: python
     
+    from celery.schedules import crontab
+    from <project_name>.celery_conf import app
     from heavy_celery.cron import spawner as _cron_scheduler
     
     @app.task()
