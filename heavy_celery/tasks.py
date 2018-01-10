@@ -180,15 +180,15 @@ def worker_process_shutdown_handler(*args, **kwargs):
     # worker.save()
 
     logger.debug('Worker Signals worker_process_shutdown {} {}'.format(args, kwargs))
-    with open('/data/static/django-celery.log', 'a') as fp:
-        fp.writer('Worker Signals worker_process_shutdown {} {}\n'.format(args, kwargs))
+    # with open('/data/static/django-celery.log', 'a') as fp:
+    #     fp.writer('Worker Signals worker_process_shutdown {} {}\n'.format(args, kwargs))
 
 
 @worker_shutdown.connect
 def worker_shutdown_handler(*args, **kwargs):
     logger.debug('Worker Signals worker_shutdown {} {}'.format(args, kwargs))
-    with open('/data/static/django-celery2.log', 'a') as fp:
-        fp.writer('Worker Signals worker_shutdown {} {}\n'.format(args, kwargs))
+    # with open('/data/static/django-celery2.log', 'a') as fp:
+    #     fp.writer('Worker Signals worker_shutdown {} {}\n'.format(args, kwargs))
 
 
 @beat_init.connect
