@@ -61,12 +61,12 @@ services:
   celery_worker:
     extends:
       web_base
-    command: bash -c "sleep 10; celery worker -Q default -A example.celery_conf -E -l info --concurrency=4"
+    command: bash -c "sleep 10; celery worker -Q default -A example.celery_conf -E -l info --concurrency=4 --heartbeat-interval=60"
 
   celery_worker_ts:
     extends:
       web_base
-    command: bash -c "sleep 10; celery worker -Q time_sensitive -A example.celery_conf -E -l info --concurrency=4"
+    command: bash -c "sleep 10; celery worker -Q time_sensitive -A example.celery_conf -E -l info --concurrency=4 --heartbeat-interval=60"
 
   celery_beat:
     extends:

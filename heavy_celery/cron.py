@@ -30,17 +30,17 @@ def spawner():
     }
     '''
     now = utils.get_now()
-    logger.debug('cron spawner {}'.format(now))
+    logger.debug('cron spawner %s', str(now))
     for schedule in models.CronSchedule.objects.filter(
             Q(next_time__lte=now),
             Q(total_run_count__lt=F('max_run_count')) | Q(max_run_count=-1),
             Q(expires__gt=now) | Q(expires__isnull=True)).select_related('task'):
-        logger.debug('cron spawner {} {} run start'.format(now, schedule))
+        logger.debug('cron spawner %s %s run start', str(now), str(schedule))
         try:
             schedule.run(now)
         except:
-            logger.exception('{} failed'.format(schedule))
-        logger.debug('cron spawner {} {} run end'.format(now, schedule))
+            logger.exception('%s failed', str(schedule))
+        logger.debug('cron spawner %s %s run end', str(now), str(schedule))
 
     for worker in models.WorkerHeartBeat.objects.filter(
             updated_at__lt=now - timedelta(minutes=15)):
