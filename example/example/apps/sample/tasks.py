@@ -18,8 +18,6 @@ logger = logging.getLogger(__name__)
 @app.task(base=base.Task)
 def hello_world(*args, **kwargs):
     logger.info("test task {} {}".format(args, kwargs))
-    _log = utils.get_logger(logger)
-    _log.info("xx test log task {} {}".format(args, kwargs))
     return 'hello world'
 
 

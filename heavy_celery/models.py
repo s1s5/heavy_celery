@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
@@ -111,6 +112,7 @@ class CronSchedule(models.Model):
             self.cron_expr, self.task)
 
 
+@python_2_unicode_compatible
 class CeleryTask(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.CASCADE)
     task_id = models.CharField('タスクID', max_length=256, unique=True)
@@ -132,6 +134,8 @@ class CeleryTask(models.Model):
     end_at = models.DateTimeField(editable=False, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    worker_id = models.CharField('ワーカーID', max_length=256, blank=True, null=True)
+
     def reexecute(self, **options):
         import_string(self.task_path).apply_async(
             args=yaml.load(self.args), kwargs=yaml.load(self.kwargs), **options)
@@ -143,3 +147,9 @@ class CeleryTask(models.Model):
             self.status = 'revoking'
         celery_revoke(self.task_id, terminate=True)
         self.save()
+
+
+@python_2_unicode_compatible
+class WorkerHeartBeat(models.Model):
+    worker_id = models.CharField('ワーカーID', max_length=256, blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)

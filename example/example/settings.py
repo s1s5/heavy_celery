@@ -50,7 +50,7 @@ INSTALLED_APPS = [
 ]
 SESSION_COOKIE_NAME = '{}-sessionid'.format(PROJECT_NAME)
 
-MIDDLEWARE_CLASSES = [
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -299,8 +299,8 @@ if not BROKER_URL:
 from kombu import Exchange, Queue  # NOQA
 # Sensible settings for celery
 CELERY_ALWAYS_EAGER = False
-CELERY_ACKS_LATE = True
-CELERY_TASK_PUBLISH_RETRY = True
+CELERY_ACKS_LATE = False  # Tasks won't restart in case of incorrect worker stop if you set CELERY_ACKS_LATE = False
+CELERY_TASK_PUBLISH_RETRY = False  # Decides if publishing task messages will be retried in the case of connection loss or other connection errors
 CELERY_DISABLE_RATE_LIMITS = False
 
 # By default we will ignore result
@@ -321,7 +321,7 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 
 CELERYD_HIJACK_ROOT_LOGGER = False
 CELERYD_PREFETCH_MULTIPLIER = 1
-CELERYD_MAX_TASKS_PER_CHILD = 1000
+CELERYD_MAX_TASKS_PER_CHILD = 1
 
 CELERY_DEFAULT_QUEUE = 'default'
 CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'

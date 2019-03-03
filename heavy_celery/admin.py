@@ -53,3 +53,9 @@ class CeleryTaskAdmin(admin.ModelAdmin):
     list_filter = ('status', 'task_path', 'created_at')
 
     actions = [reexecute_tasks, cancel_revoke_tasks, ]
+
+
+@admin.register(models.WorkerHeartBeat)
+class WorkerHeartBeatAdmin(admin.ModelAdmin):
+    model = models.CeleryTask
+    list_display = ('id', 'worker_id', 'updated_at', )

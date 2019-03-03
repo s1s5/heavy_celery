@@ -4,14 +4,15 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import logging
+from datetime import timedelta
 
 from django.db.models import Q, F
-from . import models, utils
 
 logger = logging.getLogger(__name__)
 
 
 def spawner():
+    from . import models, utils
     '''
     from <project_name>.apps.heavy_celery.cron import spawner as _cron_scheduler
     @app.task()
@@ -40,3 +41,9 @@ def spawner():
         except:
             logger.exception('{} failed'.format(schedule))
         logger.debug('cron spawner {} {} run end'.format(now, schedule))
+
+    for worker in models.WorkerHeartBeat.objects.filter(
+            updated_at__lt=now - timedelta(minutes=15)):
+        models.CeleryTask.objects.filter(worker_id=worker.worker_id,
+                                         status='started').update(status='cancelled')
+        worker.delete()

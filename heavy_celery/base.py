@@ -13,16 +13,18 @@ import six
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.utils.functional import cached_property
 
-from . import models, utils
+from . import utils
 
 logger = logging.getLogger(__name__)
 
 
 class Task(celery.Task):
-    @property
+    @cached_property
     def task(self):
         if not hasattr(self, '_task') or self._task is None:
+            from . import models
             if self.request.id is None:
                 task_id = uuid.uuid4().hex
             else:
@@ -31,6 +33,7 @@ class Task(celery.Task):
         return self._task
 
     def apply_async(self, args=None, kwargs=None, *args_, **kwargs_):
+        from . import models
         user = kwargs_.get('user')
         if user is None:
             user = utils.get_user()
@@ -63,9 +66,13 @@ class Task(celery.Task):
         except SystemExit:
             raise  # no log in revoke
         except:
+            if self.task.status == 'started':
+                self.task.status = 'failed'
             logger.exception('celery task failed')
             raise
         finally:
+            if self.task.status == 'started':
+                self.task.status = 'succeeded'
             self.task.end_at = timezone.now()
             self.task.save()
             utils.reset_task()
