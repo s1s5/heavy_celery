@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
@@ -32,39 +31,6 @@ TASK_STATE = (
     ('revoking', 'REVOKING'),
     ('retry_rejected', 'RETRY_REJECTED'),
 )
-
-
-@python_2_unicode_compatible
-class Worker(models.Model):
-    worker_id = models.CharField('ワーカーID', max_length=256)
-    started_at = models.DateTimeField(auto_now_add=True)
-    ended_at = models.DateTimeField(blank=True, null=True)
-    beated_at = models.DateTimeField(blank=True, null=True)
-
-    class State:
-        RUNNING = 0
-        STOPPED = 1
-        BEAT_FAILED = 2
-
-    STATE_CHOICES = (
-        (State.RUNNING, "開始"),
-        (State.STOPPED, "停止"),
-        (State.BEAT_FAILED, "応答なし"),
-    )
-
-    status = models.IntegerField(choices=STATE_CHOICES, default=State.RUNNING)
-
-    def __str__(self):
-        return 'worker({})'.format(self.worker_id)
-
-
-@python_2_unicode_compatible
-class WorkerTaskLog(models.Model):
-    worker = models.ForeignKey(Worker, on_delete=models.CASCADE)
-    task_id = models.CharField(max_length=256, unique=True)
-    task_path = models.CharField(max_length=256)
-    started_at = models.DateTimeField(auto_now_add=True)
-    ended_at = models.DateTimeField(blank=True, null=True)
 
 
 @python_2_unicode_compatible
@@ -177,28 +143,3 @@ class CeleryTask(models.Model):
             self.status = 'revoking'
         celery_revoke(self.task_id, terminate=True)
         self.save()
-
-
-class CeleryTaskLog(models.Model):
-    class Level:
-        DEBUG = 0
-        INFO = 1
-        WARNING = 2
-        ERROR = 3
-        CRITICAL = 4
-        EXCEPTION = 5
-
-    LEVEL_CHOICES = (
-        (Level.DEBUG, "debug"),
-        (Level.INFO, "info"),
-        (Level.WARNING, "warning"),
-        (Level.ERROR, "error"),
-        (Level.CRITICAL, "critical"),
-        (Level.EXCEPTION, "exception"),
-    )
-
-    task = models.ForeignKey(CeleryTask, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    level = models.IntegerField(choices=LEVEL_CHOICES)
-    text = models.TextField()

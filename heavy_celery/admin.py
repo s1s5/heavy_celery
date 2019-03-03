@@ -1,4 +1,3 @@
-# coding: utf-8
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
@@ -6,19 +5,6 @@ from __future__ import print_function
 from django.contrib import admin
 
 from . import models
-
-
-@admin.register(models.Worker)
-class WorkerAdmin(admin.ModelAdmin):
-    model = models.Worker
-    list_display = ('id', 'status', 'worker_id', 'started_at', 'ended_at', 'beated_at')
-    list_filter = ('status', )
-
-
-@admin.register(models.WorkerTaskLog)
-class WorkerTaskLogAdmin(admin.ModelAdmin):
-    model = models.WorkerTaskLog
-    list_display = ('id', 'worker', 'task_id', 'task_path', 'started_at', 'ended_at')
 
 
 @admin.register(models.CronSchedule)
@@ -67,10 +53,3 @@ class CeleryTaskAdmin(admin.ModelAdmin):
     list_filter = ('status', 'task_path', 'created_at')
 
     actions = [reexecute_tasks, cancel_revoke_tasks, ]
-
-
-@admin.register(models.CeleryTaskLog)
-class CeleryTaskLogAdmin(admin.ModelAdmin):
-    model = models.CeleryTaskLog
-    list_display = ('id', 'task', 'level', 'text', 'created_at', 'updated_at')
-    list_filter = ('level', )
