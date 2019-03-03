@@ -1,8 +1,9 @@
 bumpversion==0.5.3
 wheel==0.29.0
+tox
 
 amqp
-billiard
+billiard==3.5.0.2
 celery
 certifi
 chardet
