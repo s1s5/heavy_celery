@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 # import datetime
-import logging
+# import logging
 
 # # Task Signals
 # from celery.signals import before_task_publish
@@ -26,7 +26,7 @@ import logging
 # from celery.signals import celeryd_init
 # from celery.signals import worker_init
 # from celery.signals import worker_ready
-from celery.signals import heartbeat_sent
+# from celery.signals import heartbeat_sent
 # from celery.signals import worker_process_init
 # from celery.signals import worker_process_shutdown
 # from celery.signals import worker_shutdown
@@ -51,12 +51,12 @@ from celery.signals import heartbeat_sent
 
 # Deprecated Signals
 # from celery.signals import task_sent
-from django.utils import timezone
+# from django.utils import timezone
 
-from . import models, utils
+# from . import models, utils
 
 
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
 # @before_task_publish.connect
@@ -141,16 +141,16 @@ logger = logging.getLogger(__name__)
 #     logger.debug('Worker Signals worker_ready {} {}'.format(args, kwargs))
 
 
-@heartbeat_sent.connect
-def heartbeat_sent_handler(*args, **kwargs):
-    # logger.debug('Worker Signals heartbeat_sent {} {}'.format(args, kwargs))
-    whb, _ = models.WorkerHeartBeat.objects.get_or_create(worker_id=utils.get_worker_id())
-    whb.updated_at = timezone.now()
-    whb.save(update_fields=['updated_at'])
-    # models.Worker.objects.update_or_create(
-    #     worker_id=_get_worker_id(), defaults=dict(beated_at=timezone.now()))
-    # timeout = timezone.now() - datetime.timedelta(minutes=10)
-    # models.Worker.objects.filter(beated_at__lt=timeout).update(status=models.Worker.State.BEAT_FAILED)
+# @heartbeat_sent.connect
+# def heartbeat_sent_handler(*args, **kwargs):
+#     # logger.debug('Worker Signals heartbeat_sent {} {}'.format(args, kwargs))
+#     whb, _ = models.WorkerHeartBeat.objects.get_or_create(worker_id=utils.get_worker_id())
+#     whb.updated_at = timezone.now()
+#     whb.save(update_fields=['updated_at'])
+#     # models.Worker.objects.update_or_create(
+#     #     worker_id=_get_worker_id(), defaults=dict(beated_at=timezone.now()))
+#     # timeout = timezone.now() - datetime.timedelta(minutes=10)
+#     # models.Worker.objects.filter(beated_at__lt=timeout).update(status=models.Worker.State.BEAT_FAILED)
 
 
 # @worker_process_init.connect
