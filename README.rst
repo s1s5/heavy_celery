@@ -94,6 +94,7 @@ task定義の仕方
 --------------
 
 .. code-block:: python
+
     from heavy_celery import base
     
     @app.task(base=base.Task)
@@ -105,6 +106,7 @@ task定義の仕方
 ------------------------
 
 - TaskSignatureの追加
+
  - name : タスク名
  - description : タスク詳細
  - task_path : タスクパス e.g) apps.foo.tasks.example_task
@@ -112,10 +114,12 @@ task定義の仕方
  - kwargs : タスクに渡すkw引数
  - options : タスクのスケジュールオプション、どのQueueにいれるかとか
    したみたいにしておけば、time_sensitiveのQueueで走るようになる
+
   - queue: time_sensitive
     routing_key: time_sensitive_tasks
 
 - CronScheduleの追加
+
  - name : cronタスク名
  - description : cronタスク詳細
  - cron_expr : cron表記
