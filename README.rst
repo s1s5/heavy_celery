@@ -163,4 +163,6 @@ Development
 
     # release
     $ python setup.py publish  # at first
+    $ pip install readme_renderer  # at first
+    $ python setup.py check -r -s   # syntax check
     $ make release
