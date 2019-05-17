@@ -147,4 +147,3 @@ class CeleryTask(models.Model):
             self.status = 'revoking'
         celery_revoke(self.task_id, terminate=True)
         self.save()
-

@@ -31,7 +31,7 @@ def hello_world2(*args, **kwargs):
     time.sleep(5)
     logger.info("test task {} {}".format(args, kwargs))
     time.sleep(5)
-    return 'hello world'
+    return 'hello world2'
 
 
 @app.task(base=base.FileTask("txt"))
