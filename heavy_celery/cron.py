@@ -42,8 +42,3 @@ def spawner():
             logger.exception('%s failed', str(schedule))
         logger.debug('cron spawner %s %s run end', str(now), str(schedule))
 
-    # for worker in models.WorkerHeartBeat.objects.filter(
-    #         updated_at__lt=now - timedelta(minutes=15)):
-    #     models.CeleryTask.objects.filter(worker_id=worker.worker_id,
-    #                                      status='started').update(status='cancelled')
-    #     worker.delete()

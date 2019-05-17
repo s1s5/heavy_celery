@@ -3,7 +3,7 @@ wheel==0.29.0
 tox
 
 amqp
-billiard==3.5.0.2
+billiard
 celery
 certifi
 chardet

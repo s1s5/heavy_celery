@@ -148,8 +148,3 @@ class CeleryTask(models.Model):
         celery_revoke(self.task_id, terminate=True)
         self.save()
 
-
-@python_2_unicode_compatible
-class WorkerHeartBeat(models.Model):
-    worker_id = models.CharField('ワーカーID', max_length=256, blank=True, null=True)
-    updated_at = models.DateTimeField(blank=True, null=True)
