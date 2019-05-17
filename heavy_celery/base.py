@@ -45,12 +45,12 @@ class Task(celery.Task):
             args=yaml.dump(args if args is not None else ()),
             kwargs=yaml.dump(kwargs if kwargs is not None else {}))
         result = super(Task, self).apply_async(args=args, kwargs=kwargs, task_id=task_id, *args_, **kwargs_)
-        logger.debug('created celery task : {} {} name={}'.format(user, result.task_id, self.name))
+        logger.debug('created celery task : %s %s name=%s', user, result.task_id, self.name)
         return result
 
     def __call__(self, *args, **kwargs):
         self._task = None
-        logger.debug("{} {} is started.".format(self.request.id, self.task))
+        logger.debug("%s %s is started.", self.request.id, self.task)
         try:
             utils.set_task(self.task)
             if self.task.status == 'cancel':
@@ -62,7 +62,8 @@ class Task(celery.Task):
             self.task.status = 'started'
             self.task.start_at = timezone.now()
             self.task.save()
-            return self.run(*args, **kwargs)
+            retval = self.run(*args, **kwargs)
+            return self.handle_retval(retval)
         except SystemExit:
             raise  # no log in revoke
         except:
@@ -76,7 +77,7 @@ class Task(celery.Task):
             self.task.end_at = timezone.now()
             self.task.save()
             utils.reset_task()
-            logger.debug("{} is terminated.".format(self.request.id))
+            logger.debug("%s is terminated.", self.request.id)
 
     def on_success(self, retval, task_id, args, kwargs):
         if (self.task.status == 'revoked' or self.task.status == 'cancelled' or
@@ -84,31 +85,33 @@ class Task(celery.Task):
             return
         self.task.status = 'succeeded'
         self.task.save()
-        logger.debug("{} is on success.".format(self.request.id))
+        logger.debug("%s is on success.", self.request.id)
 
     def on_retry(self, exc, task_id, args, kwargs, einfo):
         self.task.status = 'retried'
         self.task.stack_trace = str(einfo)
         self.task.save()
-        logger.debug("{} is on retry. {}".format(self.request.id, einfo))
+        logger.debug("%s is on retry. %s", self.request.id, einfo)
 
     def on_failure(self, exc, task_id, args, kwargs, einfo):
         self.task.status = 'failed'
         self.task.stack_trace = str(einfo)
         self.task.save()
-        logger.debug("{} is on failure. {}".format(self.request.id, einfo))
+        logger.debug("%s is on failure. %s", self.request.id, einfo)
 
     def after_return(self, status, retval, task_id, args, kwargs, einfo):
         if self.task.status == 'succeeded':
             self.task.result_text = json.dumps(retval)
             self.task.save()
-        logger.debug("{} after_return status={}.".format(self.request.id, status))
+        logger.debug("%s after_return status=%s.", self.request.id, status)
+
+    def handle_retval(self, retval):
+        return retval
 
 
 class FileTask_(Task):
 
-    def __call__(self, *args, **kwargs):
-        retval = super(FileTask_, self).__call__(*args, **kwargs)
+    def handle_retval(self, retval):
         try:
             filename = '{}.{}'.format(uuid.uuid4().hex, self.ext)
             if hasattr(retval, 'read'):
@@ -119,8 +122,7 @@ class FileTask_(Task):
             elif isinstance(retval, six.string_types) or isinstance(retval, six.binary_type):
                 self.task.result_data.save(filename, ContentFile(retval), save=True)
             else:
-                return None
-            self.task.save()
+                return retval
             return filename
         except:
             logger.exception('FileTask_ failed')
