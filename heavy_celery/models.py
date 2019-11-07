@@ -5,12 +5,13 @@ from __future__ import print_function
 from future.utils import python_2_unicode_compatible
 import yaml
 
-from celery.task.control import revoke as celery_revoke
 
 from django.conf import settings
 from django.db import models
 from django.utils.functional import SimpleLazyObject
 from django.utils.module_loading import import_string
+from django.template.defaultfilters import truncatechars
+
 
 from . import utils
 
@@ -136,6 +137,10 @@ class CeleryTask(models.Model):
 
     worker_id = models.CharField('ワーカーID', max_length=256, blank=True, null=True)
 
+    @property
+    def short_result_text(self):
+        return truncatechars(self.result_text, 100)
+
     def reexecute(self, **options):
         import_string(self.task_path).apply_async(
             args=yaml.load(self.args), kwargs=yaml.load(self.kwargs), **options)
@@ -145,5 +150,9 @@ class CeleryTask(models.Model):
             self.status = 'cancel'
         else:
             self.status = 'revoking'
-        celery_revoke(self.task_id, terminate=True)
         self.save()
+
+        from django.conf import settings
+        from django.utils.module_loading import import_string
+        revoke = import_string(settings.CELERY_REVOKE, **getattr(settings, 'CELERY_REVOKE_KWARGS', {}))
+        revoke.delay(self.task_id)

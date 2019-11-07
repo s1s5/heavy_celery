@@ -63,6 +63,7 @@ class Task(celery.Task):
             self.task.start_at = timezone.now()
             self.task.save()
             retval = self.run(*args, **kwargs)
+            self.task.status = 'ended'
             return self.handle_retval(retval)
         except SystemExit:
             raise  # no log in revoke
@@ -72,8 +73,11 @@ class Task(celery.Task):
             logger.exception('celery task failed')
             raise
         finally:
-            if self.task.status == 'started':
+            if self.task.status == 'ended':
                 self.task.status = 'succeeded'
+            elif self.task.status == 'started':
+                self.task.status = 'revoked'
+
             self.task.end_at = timezone.now()
             self.task.save()
             utils.reset_task()
@@ -83,7 +87,9 @@ class Task(celery.Task):
         if (self.task.status == 'revoked' or self.task.status == 'cancelled' or
                 self.task.status == 'retry_rejected'):
             return
-        self.task.status = 'succeeded'
+        if self.task.status == 'revoking':
+            self.task.status = 'revoked'
+        # self.task.status = 'succeeded'
         self.task.save()
         logger.debug("%s is on success.", self.request.id)
 

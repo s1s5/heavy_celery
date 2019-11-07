@@ -28,9 +28,11 @@ def test_exception(*args, **kwargs):
 
 @app.task(base=base.Task)
 def hello_world2(*args, **kwargs):
-    time.sleep(5)
+    logger.info("test task started {} {}".format(args, kwargs))
+    time.sleep(50)
     logger.info("test task {} {}".format(args, kwargs))
-    time.sleep(5)
+    time.sleep(50)
+    logger.info("test task ended {} {}".format(args, kwargs))
     return 'hello world2'
 
 
@@ -50,6 +52,14 @@ def create_file2(*args, **kwargs):
 @app.task()
 def cron_scheduler():
     _cron_scheduler()
+
+
+@app.task()
+def celery_revoke(task_id):
+    logger.info("revoking {}".format(task_id))
+    from celery.task.control import revoke
+    revoke(task_id, terminate=True)
+    logger.info("revoked! {}".format(task_id))
 
 
 app.conf.beat_schedule = {

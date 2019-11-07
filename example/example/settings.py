@@ -341,3 +341,8 @@ INSTALLED_APPS += [
 
     'example.apps.sample',
 ]
+CELERY_REVOKE = 'example.apps.sample.tasks.celery_revoke'
+
+MIDDLEWARE += [
+    'heavy_celery.middlewares.GlobalRequestMiddleware',
+]

@@ -31,22 +31,9 @@ Add it to your `INSTALLED_APPS`:
 
     INSTALLED_APPS = (
         ...
-        'heavy_celery.apps.HeavyCeleryConfig',
+        'heavy_celery',
         ...
     )
-
-Add heavy_celery's URL patterns:
-
-.. code-block:: python
-
-    from heavy_celery import urls as heavy_celery_urls
-
-
-    urlpatterns = [
-        ...
-        url(r'^', include(heavy_celery_urls)),
-        ...
-    ]
 
 Features
 --------
@@ -57,7 +44,7 @@ settings.py
 .. code-block:: python
 
     CELERY_DEFAULT_QUEUE = 'default'
-    CELERY_DEFAULT_EXCHANGE_TYPE = 'topic'
+    CELERY_DEFAULT_EXCHANGE_TYPE = 'default'
     CELERY_DEFAULT_ROUTING_KEY = 'default'
     
     CELERY_QUEUES = (
@@ -65,6 +52,22 @@ settings.py
         Queue('time_sensitive', Exchange('time_sensitive'), routing_key='time_sensitive_tasks'),
         Queue('background', Exchange('background'), routing_key='background'),
     )
+
+    CELERY_REVOKE = 'example.apps.sample.tasks.celery_revoke'  # 適当なモジュールパスに変更
+    MIDDLEWARE += [
+        'heavy_celery.middlewares.GlobalRequestMiddleware',
+    ]
+
+
+example/apps/sample/tasks.py
+----------------------------
+
+.. code-block:: python
+
+    @app.task()
+    def celery_revoke(task_id):
+        from celery.task.control import revoke
+        revoke(task_id, terminate=True)
 
 
 cronの機能を使うために
@@ -110,8 +113,8 @@ task定義の仕方
  - name : タスク名
  - description : タスク詳細
  - task_path : タスクパス e.g) apps.foo.tasks.example_task
- - args : タスクに渡す引数
- - kwargs : タスクに渡すkw引数
+ - args : タスクに渡す引数(yaml形式)
+ - kwargs : タスクに渡すkw引数(yaml形式)
  - options : タスクのスケジュールオプション、どのQueueにいれるかとか
    したみたいにしておけば、time_sensitiveのQueueで走るようになる
 

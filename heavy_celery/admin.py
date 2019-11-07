@@ -49,7 +49,7 @@ class CeleryTaskAdmin(admin.ModelAdmin):
     model = models.CeleryTask
     list_display = ('id', 'status', 'user', 'task_id', 'task_path',
                     'created_at', 'updated_at', 'start_at', 'end_at',
-                    'result_text', 'result_data')
+                    'short_result_text', 'result_data')
     list_filter = ('status', 'task_path', 'created_at')
 
     actions = [reexecute_tasks, cancel_revoke_tasks, ]

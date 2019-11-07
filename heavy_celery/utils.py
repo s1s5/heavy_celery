@@ -11,6 +11,7 @@ from django.utils import timezone
 # from django.utils.module_loading import import_string
 from croniter import croniter
 
+from . import middlewares
 
 _app = None
 _task = {}
@@ -42,6 +43,15 @@ def _return_none():
     return None
 
 
+def _get_global_request(attr=None):
+    th_local = middlewares.GlobalRequestMiddleware.thread_local
+    if hasattr(th_local, 'request'):
+        if attr:
+            return getattr(th_local.request, attr, None)
+        return th_local.request
+    return None
+
+
 def get_user():
     global _get_request
 
@@ -55,6 +65,12 @@ def get_user():
 
     if _get_request is None:
         _get_request = _return_none
+        if 'heavy_celery.middlewares.GlobalRequestMiddleware' in MIDDLEWARE:
+            try:
+                _get_request = _get_global_request
+            except ImportError:
+                pass
+
         if 'django_busybody.middlewares.GlobalRequestMiddleware' in MIDDLEWARE:
             try:
                 from django_busybody.tools import get_global_request
