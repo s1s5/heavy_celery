@@ -21,16 +21,16 @@ logger = logging.getLogger(__name__)
 
 
 class Task(celery.Task):
-    @cached_property
-    def task(self):
-        if not hasattr(self, '_task') or self._task is None:
-            from . import models
-            if self.request.id is None:
-                task_id = uuid.uuid4().hex
-            else:
-                task_id = self.request.id
-            self._task, _ = models.CeleryTask.objects.get_or_create(task_id=task_id)
-        return self._task
+    # @cached_property
+    # def task(self):
+    #     if not hasattr(self, '_task') or self._task is None:
+    #         from . import models
+    #         if self.request.id is None:
+    #             task_id = uuid.uuid4().hex
+    #         else:
+    #             task_id = self.request.id
+    #         self._task, _ = models.CeleryTask.objects.get_or_create(task_id=task_id)
+    #     return self._task
 
     def apply_async(self, args=None, kwargs=None, *args_, **kwargs_):
         from . import models
@@ -40,25 +40,30 @@ class Task(celery.Task):
         task_id = kwargs_.pop('task_id', None)
         if task_id is None:
             task_id = uuid.uuid4().hex
-        models.CeleryTask.objects.create(
+        ct = models.CeleryTask.objects.create(
             user=user, task_id=task_id, task_path=self.name,
             args=yaml.dump(args if args is not None else ()),
             kwargs=yaml.dump(kwargs if kwargs is not None else {}))
         result = super(Task, self).apply_async(args=args, kwargs=kwargs, task_id=task_id, *args_, **kwargs_)
-        logger.debug('created celery task : %s %s name=%s', user, result.task_id, self.name)
+        logger.debug('created celery task : %s %s name=%s, pk=%s', user, result.task_id, self.name, ct.pk)
         return result
 
     def __call__(self, *args, **kwargs):
-        self._task = None
-        logger.debug("%s %s is started.", self.request.id, self.task)
+        # if hasattr(self, 'task'):
+        #     del self.task
+        # self._task = None
+        from . import models
+        self.task = models.CeleryTask.objects.get(task_id=self.request.id)
+
+        logger.debug("%s %s is started. (status=%s)", self.request.id, self.task, self.task.status)
         try:
             utils.set_task(self.task)
             if self.task.status == 'cancel':
                 self.task.status = 'cancelled'
                 return
-            elif self.task.status != 'sent':
-                self.task.status = 'retry_rejected'
-                return
+            # elif self.task.status != 'sent':
+            #     self.task.status = 'retry_rejected'
+            #     return
             self.task.status = 'started'
             self.task.start_at = timezone.now()
             self.task.save()
